@@ -19,20 +19,21 @@ import {
   IconBook,
   IconBox,
   IconCommand,
+  IconEyeOff,
   IconGraph,
   IconInfoCircle,
   IconLego,
   IconListDetails,
   IconLock,
   IconShield,
-} from 'twenty-ui/display';
+  InlineBanner,
+} from 'twenty-ui-deprecated/display';
 import {
   ApplicationRegistrationSourceType,
   FindMarketplaceAppDetailDocument,
   FindOneApplicationByUniversalIdentifierDocument,
   PermissionFlagType,
 } from '~/generated-metadata/graphql';
-import { SettingsApplicationDetailTitle } from '~/pages/settings/applications/components/SettingsApplicationDetailTitle';
 import { SettingsApplicationDetailAboutTab } from '~/pages/settings/applications/tabs/SettingsApplicationDetailAboutTab';
 import { SettingsApplicationDetailContentTab } from '~/pages/settings/applications/tabs/SettingsApplicationDetailContentTab';
 import { SettingsApplicationPermissionsTab } from '~/pages/settings/applications/tabs/SettingsApplicationPermissionsTab';
@@ -283,16 +284,15 @@ export const SettingsAvailableApplicationDetails = () => {
           },
           { children: displayName },
         ]}
-        title={
-          <SettingsApplicationDetailTitle
-            displayName={displayName}
-            description={description}
-            applicationId={application?.id}
-            isUnlisted={isUnlisted}
-          />
-        }
+        title={displayName}
       >
         <SettingsPageContainer>
+          {isUnlisted && (
+            <InlineBanner
+              LeftIcon={IconEyeOff}
+              message={t`Application not listed on the marketplace. It was shared via a direct link`}
+            />
+          )}
           <TabList
             tabs={tabs}
             componentInstanceId={AVAILABLE_APPLICATION_DETAIL_ID}

@@ -1,6 +1,5 @@
 import { styled } from '@linaria/react';
 import { useLingui } from '@lingui/react/macro';
-import { Link } from 'react-router-dom';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
@@ -26,21 +25,17 @@ import { useAtomState } from '@/ui/utilities/state/jotai/hooks/useAtomState';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { CombinedGraphQLErrors } from '@apollo/client/errors';
 import { useMutation } from '@apollo/client/react';
-import { SettingsPath } from 'twenty-shared/types';
-import { getSettingsPath } from 'twenty-shared/utils';
-import { Tag } from 'twenty-ui/components';
 import {
   H2Title,
   IconClockHour8,
   IconHistory,
-  IconLock,
   IconMail,
   IconTrash,
-} from 'twenty-ui/display';
-import { Button } from 'twenty-ui/input';
-import { Card, Section } from 'twenty-ui/layout';
-import { themeCssVariables } from 'twenty-ui/theme-constants';
+} from 'twenty-ui-deprecated/display';
+import { Card, Section } from 'twenty-ui-deprecated/layout';
+import { themeCssVariables } from 'twenty-ui-deprecated/theme-constants';
 import { UpdateWorkspaceDocument } from '~/generated-metadata/graphql';
+import { OrganizationAdornment } from '~/pages/settings/enterprise/components/OrganizationAdornment';
 
 const StyledContainer = styled.div`
   width: 100%;
@@ -55,16 +50,6 @@ const StyledMainContent = styled.div`
 
 const StyledSectionContainer = styled.div`
   flex-shrink: 0;
-`;
-
-const StyledLinkContainer = styled.div`
-  > a {
-    text-decoration: none;
-
-    &[data-disabled='true'] {
-      pointer-events: none;
-    }
-  }
 `;
 
 export const SettingsSecuritySettings = () => {
@@ -204,14 +189,7 @@ export const SettingsSecuritySettings = () => {
             <H2Title
               title={t`SSO`}
               description={t`Configure an SSO connection`}
-              adornment={
-                <Tag
-                  text={t`Enterprise`}
-                  color="transparent"
-                  Icon={IconLock}
-                  variant="border"
-                />
-              }
+              adornment={<OrganizationAdornment />}
             />
             <SettingsSSOIdentitiesProvidersListCard />
           </Section>
@@ -259,56 +237,28 @@ export const SettingsSecuritySettings = () => {
         <Section>
           <H2Title
             title={t`Audit Logs`}
-            description={t`View workspace activity logs`}
-            adornment={
-              <Tag
-                text={t`Enterprise`}
-                color="transparent"
-                Icon={IconLock}
-                variant="border"
-              />
-            }
+            description={t`Configure how long audit logs are retained`}
+            adornment={<OrganizationAdornment />}
           />
           {hasEnterpriseAccess ? (
             <Card rounded>
-              <SettingsOptionCardContentButton
-                Icon={IconHistory}
-                title={t`Workspace Events`}
-                description={
-                  !isClickHouseConfigured
-                    ? t`ClickHouse is required for audit logs. Contact your administrator.`
-                    : t`View and filter events, page views, object changes`
-                }
-                Button={
-                  <StyledLinkContainer>
-                    <Link
-                      to={getSettingsPath(SettingsPath.EventLogs)}
-                      data-disabled={!isEventLogsEnabled}
-                    >
-                      <Button
-                        title={t`View Logs`}
-                        variant="secondary"
-                        size="small"
-                        disabled={!isEventLogsEnabled}
-                      />
-                    </Link>
-                  </StyledLinkContainer>
-                }
-              />
-              {isEventLogsEnabled && (
-                <>
-                  <Separator />
-                  <SettingsOptionCardContentCounter
-                    Icon={IconClockHour8}
-                    title={t`Log retention`}
-                    description={t`Number of days to retain audit logs (30-1095 days)`}
-                    value={currentWorkspace?.eventLogRetentionDays ?? 90}
-                    onChange={handleEventLogRetentionDaysChange}
-                    minValue={30}
-                    maxValue={1095}
-                    showButtons={false}
-                  />
-                </>
+              {isEventLogsEnabled ? (
+                <SettingsOptionCardContentCounter
+                  Icon={IconClockHour8}
+                  title={t`Log retention`}
+                  description={t`Number of days to retain audit logs (30-1095 days)`}
+                  value={currentWorkspace?.eventLogRetentionDays ?? 90}
+                  onChange={handleEventLogRetentionDaysChange}
+                  minValue={30}
+                  maxValue={1095}
+                  showButtons={false}
+                />
+              ) : (
+                <SettingsOptionCardContentButton
+                  Icon={IconHistory}
+                  title={t`Audit Logs`}
+                  description={t`ClickHouse is required for audit logs. Contact your administrator.`}
+                />
               )}
             </Card>
           ) : (
